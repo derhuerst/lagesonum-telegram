@@ -24,10 +24,13 @@
 	"dependencies": {
 		"coffee-script":			"^1.10.0",
 		"config":					"^1.16.0",
+		"redis":					"^2.2.5",
 		"node-telegram-bot-api":	"^0.15.0"
 	},
 	"scripts": {
-		"bot":		"coffee index.coffee",
-		"test":		"echo \"Error: no test specified\" && exit 1"
+		"start-redis":	"coffee ./scripts/start-redis.coffee",
+		"stop-redis":	"coffee ./scripts/stop-redis.coffee",
+		"bot":			"coffee index.coffee",
+		"test":			"echo \"Error: no test specified\" && exit 1"
 	}
 }
