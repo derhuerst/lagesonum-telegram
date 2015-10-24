@@ -10,7 +10,13 @@ var bot = new TelegramBot(token, {
 
 bot.onText(/.*/, function(msg) {
 	console.log(msg);
-	return bot.sendMessage(msg.from.id, 'bla');
+	return bot.sendMessage(post.userid post.text);
+});
+
+bot.onText(/STOP B123/, function(msg) {
+	console.log(msg);
+	server.send('stop')
+	return bot.sendMessage(post.userid post.text);
 });
 
 console.log("Server is running");
