@@ -2,21 +2,28 @@
 
 var	config = require('config'),
 	TelegramBot = require('node-telegram-bot-api'),
-	token = config.get('telegramToken');
+	token = config.telegramToken,
+	request = {};
 
 var bot = new TelegramBot(token, {
 	polling: true
 });
 
-bot.onText(/.*/, function(msg) {
-	console.log(msg);
-	return bot.sendMessage(post.userid post.text);
+bot.onText(/\/.*/, function(msg) {
+	var regex = /\/([^ ]+) (.*)/g;
+		commandwithVariable = msg.text.match(regex),
+		command = commandwithVariable[0],
+		string = commandwithVariable[1];
+	console.log("message received: " + msg.text);
+	console.log("command received: " + command);
+	switch (command) {
+		case "unsubscribe":
+			return bot.sendMessage(msg.from.id, "unsubscribed: \"" + string + "\"");
+			break;
+		default:
+			return bot.sendMessage(msg.from.id, "command: " + command);
+			break;
+	}
 });
 
-bot.onText(/STOP B123/, function(msg) {
-	console.log(msg);
-	server.send('stop')
-	return bot.sendMessage(post.userid post.text);
-});
-
-console.log("Server is running");
+console.log("Bot is running");
