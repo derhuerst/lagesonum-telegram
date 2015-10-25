@@ -1,4 +1,4 @@
-// default.js
+// production.js
 
 module.exports = {
 	lagesonum: {

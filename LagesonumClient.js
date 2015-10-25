@@ -1,11 +1,14 @@
+// LagesonumClient.js
+
 var url = require('url'),
 	request = require('request-promise');
 
 module.exports = {
-	lagesonum:	null,
+	lagesonum: null,
 
 	init: function (lagesonum) {
 		this.lagesonum = url.format({
+			protocol:	lagesonum.protocol,
 			hostname:	lagesonum.hostname,
 			port:		lagesonum.port,
 			pathname:	lagesonum.pathname,
