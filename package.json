@@ -25,8 +25,8 @@
     "coffee-script": "^1.10.0",
     "config": "^1.16.0",
     "node-telegram-bot-api": "^0.15.0",
-    "shortid": "~2.2.4",
-    "request": "~2.65.0"
+    "shortid": "^2.2.4",
+    "request-promise": "^1.0.2"
   },
   "scripts": {
     "start-redis": "node ./scripts/start-redis.js",
