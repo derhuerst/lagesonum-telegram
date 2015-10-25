@@ -101,7 +101,7 @@ function sendRequest(request) {
 		body: request
 	}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
-				if (body.requestid === request.requestid && body.status === "success") {
+				if (body.requestid === request.requestid && body.success === true) {
 					console.log(body);
 					return body.data;
 				} else {
