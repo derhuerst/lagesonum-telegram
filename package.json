@@ -1,35 +1,37 @@
 {
-	"name":			"lagesonum-telegram",
-	"version":		"0.1.0",
-	"description":	"A Telegram bot for tracking the tickets at LaGeSo Berlin.",
-	"author":		"Jannis R <mail@jannisr.de>",
-	"license":		"MIT",
-	"keywords": [
-		"telegram",
-		"bot",
-		"lageso",
-		"berlin",
-		"ticket",
-		"number",
-		"coffeescript",
-		"javascript"
-	],
-	"homepage":		"https://github.com/derhuerst/lagesonum-telegram",
-	"bugs": "https://github.com/derhuerst/lagesonum-telegram/issues",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/derhuerst/lagesonum-telegram.git"
-	},
-	"main":			"index.js",
-	"dependencies": {
-		"coffee-script":			"^1.10.0",
-		"config":					"^1.16.0",
-		"node-telegram-bot-api":	"^0.15.0"
-	},
-	"scripts": {
-		"start-redis":	"node ./scripts/start-redis.js",
-		"stop-redis":	"node ./scripts/stop-redis.js",
-		"bot":			"node index.js",
-		"test":			"echo \"Error: no test specified\" && exit 1"
-	}
+  "name": "lagesonum-telegram",
+  "version": "0.1.0",
+  "description": "A Telegram bot for tracking the tickets at LaGeSo Berlin.",
+  "author": "Jannis R <mail@jannisr.de>, @ffflorian",
+  "license": "MIT",
+  "keywords": [
+    "telegram",
+    "bot",
+    "lageso",
+    "berlin",
+    "ticket",
+    "number",
+    "coffeescript",
+    "javascript"
+  ],
+  "homepage": "https://github.com/derhuerst/lagesonum-telegram",
+  "bugs": "https://github.com/derhuerst/lagesonum-telegram/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/derhuerst/lagesonum-telegram.git"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "coffee-script": "^1.10.0",
+    "config": "^1.16.0",
+    "node-telegram-bot-api": "^0.15.0",
+    "shortid": "~2.2.4",
+    "request": "~2.65.0"
+  },
+  "scripts": {
+    "start-redis": "node ./scripts/start-redis.js",
+    "stop-redis": "node ./scripts/stop-redis.js",
+    "bot": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
 }
