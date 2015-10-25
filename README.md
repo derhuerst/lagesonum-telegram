@@ -1,6 +1,6 @@
 # lagesonum-telegram
 
-*lagesonum-telegram* is a Telegram bot for tracking the tickets at LaGeSo Berlin.
+*lagesonum-telegram* is a Telegram bot for notifying the users of [LaGeSoNUM](https://github.com/volunteer-planner/lagesonum) Berlin.
 
 work in progress!
 
