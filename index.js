@@ -1,120 +1,93 @@
-// index.js
+var	config = require('config');
+var shortid = require('shortid');
+var TelegramBot = require('node-telegram-bot-api');
 
-var	config = require('config'),
-	shortid = require('shortid'),
-	requester = require('request'),
-	TelegramBot = require('node-telegram-bot-api'),
-	token = config.telegramToken;
+var LagesonumClient = require('./LagesonumClient');
 
-var bot = new TelegramBot(token, {
+
+
+
+
+var telegramBot = new TelegramBot(config.telegramToken, {
 	polling: true
 });
+var lagesonumClient = Object.create(LagesonumClient)
+lagesonumClient.init(config.lagesonum);
 
-bot.onText(/\/subscribe (.+)/, function(msg, match) {
+var ticketFormat = /^[a-z][0-9]{3}$/i;
+
+
+
+telegramBot.onText(/\/subscribe (.+)/, function(msg, match) {
+	var user = msg.from.id;
 	var ticket = match[1];
+	if (!ticketFormat.test(ticket))
+		return self.sendMessage(user, 'Wrong ticket format. Tickets have this format: B123');
 
-	if (checkTicket(ticket)) {
-		var request = {
-			"userid": msg.from.id,
-			"ticket": ticket,
-			"subscribe": true,
-			"language": "en_US"
-		};
-		if (sendRequest(request) !== false) {
-			return bot.sendMessage(msg.from.id, "Successfully subscribed to ticket: \"" + ticket + "\"");
-		} else {
-			return bot.sendMessage(msg.from.id, "There was an error.");
-		}
-	} else {
-		return bot.sendMessage(msg.from.id, "Wrong ticket format. Tickets have this format: B123");
-	}
+	var self = this;
+	lagesonumClient.subscribe(user, ticket)
+	.catch(function (err) {
+		self.sendMessage(user, 'There was an error: ' + err.message);
+	})
+	.then(function () {
+		self.sendMessage(user, 'You successfully subscribed to the ticket ' + ticket + '.');
+	});
 });
 
-bot.onText(/\/unsubscribe (.+)/, function(msg, match) {
+
+
+telegramBot.onText(/\/unsubscribe (.+)/, function(msg, match) {
+	var user = msg.from.id;
 	var ticket = match[1];
+	if (!ticketFormat.test(ticket))
+		return self.sendMessage(user, 'Wrong ticket format. Tickets have this format: B123');
 
-	if (checkTicket(ticket)) {
-		var request = {
-			"userid": msg.from.id,
-			"ticket": ticket,
-			"subscribe": false
-		};
-		if (sendRequest(request) !== false) {
-			return bot.sendMessage(msg.from.id, "Successfully unsubscribed from ticket: \"" + ticket + "\"");
-		} else {
-			return bot.sendMessage(msg.from.id, "There was an error.");
-		}
-	} else {
-		return bot.sendMessage(msg.from.id, "Wrong ticket format. Tickets have this format: B123");
-	}
+	var self = this;
+	lagesonumClient.unsubscribe(user, ticket)
+	.catch(function (err) {
+		self.sendMessage(user, 'There was an error: ' + err.message);
+	})
+	.then(function () {
+		self.sendMessage(user, 'You successfully unsubscribed from the ticket ' + ticket + '.');
+	});
 });
 
-bot.onText(/\/stop/, function(msg) {
-	var request = {
-		"userid": msg.from.id,
-		"subscribe": false
-	};
-	if (sendRequest(request) !== false) {
-		return bot.sendMessage(msg.from.id, "Successfully unsubscribed from all tickets.");
-	} else {
-		return bot.sendMessage(msg.from.id, "There was an error.");
-	}
+
+
+telegramBot.onText(/\/stop/, function(msg) {
+	var user = msg.from.id;
+
+	var self = this;
+	lagesonumClient.unsubscribeAll(user)
+	.catch(function (err) {
+		self.sendMessage(user, 'There was an error: ' + err.message);
+	})
+	.then(function () {
+		self.sendMessage(user, 'You successfully unsubscribed from the all tickets.');
+	});
 });
 
-bot.onText(/\/tickets/, function(msg) {
-	var request = {
-		"userid": msg.from.id,
-		"list": true
-	};
-	var tickets = sendRequest(request);
-	if (tickets !== false) {
-		return bot.sendMessage(msg.from.id, "You are currently subscribed to these tickets: \n" + tickets.join("\n"));
-	} else {
-		return bot.sendMessage(msg.from.id, "There was an error.");
-	}
+
+
+telegramBot.onText(/\/tickets/, function(msg) {
+	var user = msg.from.id;
+
+	var self = this;
+	lagesonumClient.unsubscribeAll(user)
+	.catch(function (err) {
+		self.sendMessage(user, 'There was an error: ' + err.message);
+	})
+	.then(function () {
+		self.sendMessage(user, 'You are subscribed to the following tickets.\n' + tickets.join('\n'));
+	});
 });
 
-bot.onText(/\/(?!subscribe|unsubscribe|stop|tickets)[a-z0-9]+/, function(msg) {
-	return bot.sendMessage(msg.from.id, "unknown command!"); // + usage
+
+
+telegramBot.onText(/\/(?!subscribe|unsubscribe|stop|tickets)[a-z0-9]+/, function(msg) {
+	return telegramBot.sendMessage(msg.from.id, "unknown command!"); // + usage
 });
 
-function checkTicket(ticket) {
-	if (ticket.match(/[A-Za-z][0-9]{3}/)) {
-		var request = {
-			"search": true,
-			"ticket": ticket
-		};
-		if (sendRequest(request) !== false) {
-			return true;
-		}
-	} else {
-		return false;
-	}
-}
 
-function sendRequest(request) {
-	request.requestid = shortid.generate();
-	console.log(request);
-	requester.post({
-		json: true,
-		url: 'localhost:1234',
-		body: request
-	}, function (error, response, body) {
-			if (!error && response.statusCode == 200) {
-				if (body.requestid === request.requestid && body.success === true) {
-					console.log(body);
-					return body.data;
-				} else {
-					// send a message to the developer
-					console.log(body);
-					return false;
-				}
-			} else {
-				console.log(response);
-				return false;
-			}
-		}
-	);
-}
 
-console.log("Bot is running");
+console.log('Bot is running');
