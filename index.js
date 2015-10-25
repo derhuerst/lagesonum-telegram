@@ -1,28 +1,25 @@
-var	config = require('config');
-var shortid = require('shortid');
-var TelegramBot = require('node-telegram-bot-api');
-
-var LagesonumClient = require('./LagesonumClient');
-
-
-
+var	config = require('config'),
+	shortid = require('shortid'),
+	TelegramBot = require('node-telegram-bot-api'),
+	LagesonumClient = require('./LagesonumClient'),
+	ticketFormat = /^[a-z][0-9]{3}$/i;
 
 
 var telegramBot = new TelegramBot(config.telegramToken, {
 	polling: true
 });
-var lagesonumClient = Object.create(LagesonumClient)
+
+var lagesonumClient = Object.create(LagesonumClient);
+
 lagesonumClient.init(config.lagesonum);
 
-var ticketFormat = /^[a-z][0-9]{3}$/i;
-
-
-
 telegramBot.onText(/\/subscribe (.+)/, function(msg, match) {
-	var user = msg.from.id;
-	var ticket = match[1];
-	if (!ticketFormat.test(ticket))
+	var user = msg.from.id,
+		ticket = match[1];
+
+	if (!ticketFormat.test(ticket)) {
 		return self.sendMessage(user, 'Wrong ticket format. Tickets have this format: B123');
+	}
 
 	var self = this;
 	lagesonumClient.subscribe(user, ticket)
@@ -34,11 +31,10 @@ telegramBot.onText(/\/subscribe (.+)/, function(msg, match) {
 	});
 });
 
-
-
 telegramBot.onText(/\/unsubscribe (.+)/, function(msg, match) {
 	var user = msg.from.id;
-	var ticket = match[1];
+		ticket = match[1];
+
 	if (!ticketFormat.test(ticket))
 		return self.sendMessage(user, 'Wrong ticket format. Tickets have this format: B123');
 
@@ -52,12 +48,10 @@ telegramBot.onText(/\/unsubscribe (.+)/, function(msg, match) {
 	});
 });
 
-
-
 telegramBot.onText(/\/stop/, function(msg) {
-	var user = msg.from.id;
+	var user = msg.from.id,
+		self = this;
 
-	var self = this;
 	lagesonumClient.unsubscribeAll(user)
 	.catch(function (err) {
 		self.sendMessage(user, 'There was an error: ' + err.message);
@@ -67,12 +61,10 @@ telegramBot.onText(/\/stop/, function(msg) {
 	});
 });
 
-
-
 telegramBot.onText(/\/tickets/, function(msg) {
-	var user = msg.from.id;
+	var user = msg.from.id,
+		self = this;
 
-	var self = this;
 	lagesonumClient.unsubscribeAll(user)
 	.catch(function (err) {
 		self.sendMessage(user, 'There was an error: ' + err.message);
@@ -82,12 +74,8 @@ telegramBot.onText(/\/tickets/, function(msg) {
 	});
 });
 
-
-
 telegramBot.onText(/\/(?!subscribe|unsubscribe|stop|tickets)[a-z0-9]+/, function(msg) {
 	return telegramBot.sendMessage(msg.from.id, "unknown command!"); // + usage
 });
-
-
 
 console.log('Bot is running');

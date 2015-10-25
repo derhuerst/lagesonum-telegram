@@ -1,29 +1,18 @@
-var url =			require('url');
-var request =		require('request-promise');
-
-
-
-
+var url = require('url'),
+	request = require('request-promise');
 
 module.exports = {
-
-
-
 	lagesonum:	null,
-
-
 
 	init: function (lagesonum) {
 		this.lagesonum = url.format({
-			hostname:		lagesonum.hostname,
-			port:			lagesonum.port,
-			pathname:		lagesonum.pathname,
+			hostname:	lagesonum.hostname,
+			port:		lagesonum.port,
+			pathname:	lagesonum.pathname,
 		});
 
 		return this;
 	},
-
-
 
 	subscriptions: function (user) {
 		return request({
@@ -75,7 +64,4 @@ module.exports = {
 			}
 		});
 	}
-
-
-
 };
