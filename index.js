@@ -10,10 +10,11 @@ var bot = new TelegramBot(token, {
 });
 
 bot.onText(/\/.*/, function(msg) {
-	var regex = /\/([^ ]+) (.*)/g;
+	var regex = /\/([^ ]+) (.*)/;
 		commandwithVariable = msg.text.match(regex),
-		command = commandwithVariable[0],
-		string = commandwithVariable[1];
+		console.log(commandwithVariable);
+		command = commandwithVariable[1],
+		string = commandwithVariable[2];
 	console.log("message received: " + msg.text);
 	console.log("command received: " + command);
 	switch (command) {
