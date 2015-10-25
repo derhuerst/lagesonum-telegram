@@ -2,56 +2,112 @@
 
 var	config = require('config'),
 	shortid = require('shortid'),
-	request = require('request'),
+	requester = require('request'),
 	TelegramBot = require('node-telegram-bot-api'),
 	token = config.telegramToken;
-
-var request = {
-		"requestid": "",
-		"language": "de_DE",
-		"tickets": [],
-		"subscribe": false
-	};
 
 var bot = new TelegramBot(token, {
 	polling: true
 });
 
 bot.onText(/\/subscribe (.+)/, function(msg, match) {
-	var arg = match[1];
+	var ticket = match[1];
 
-	if (checkTicket(arg)) {
-		request.requestid = shortid.generate();
-		request.subscribe = true;
-		request.tickets.push(arg);
-		console.log(request);
-		// send request
-		return bot.sendMessage(msg.from.id, "Successfully subscribed to ticket: \"" + arg + "\"");
+	if (checkTicket(ticket)) {
+		var request = {
+			"userid": msg.from.id,
+			"ticket": ticket,
+			"subscribe": true,
+			"language": "en_US"
+		};
+		if (sendRequest(request) !== false) {
+			return bot.sendMessage(msg.from.id, "Successfully subscribed to ticket: \"" + ticket + "\"");
+		} else {
+			return bot.sendMessage(msg.from.id, "There was an error.");
+		}
 	} else {
 		return bot.sendMessage(msg.from.id, "Wrong ticket format. Tickets have this format: B123");
 	}
 });
 
 bot.onText(/\/unsubscribe (.+)/, function(msg, match) {
-	var arg = match[1];
+	var ticket = match[1];
 
-	if (checkTicket(arg)) {
-		request.requestid = shortid.generate();
-		request.tickets.push(arg);
-		console.log(request);
-		// send request
-		return bot.sendMessage(msg.from.id, "Successfully unsubscribed from ticket: \"" + arg + "\"");
+	if (checkTicket(ticket)) {
+		var request = {
+			"userid": msg.from.id,
+			"ticket": ticket,
+			"subscribe": false
+		};
+		if (sendRequest(request) !== false) {
+			return bot.sendMessage(msg.from.id, "Successfully unsubscribed from ticket: \"" + ticket + "\"");
+		} else {
+			return bot.sendMessage(msg.from.id, "There was an error.");
+		}
 	} else {
 		return bot.sendMessage(msg.from.id, "Wrong ticket format. Tickets have this format: B123");
 	}
 });
 
-bot.onText(/\/(?!subscribe|unsubscribe)[a-z0-9]+/, function(msg, match) {
+bot.onText(/\/stop/, function(msg) {
+	var request = {
+		"userid": msg.from.id,
+		"subscribe": false
+	};
+	if (sendRequest(request) !== false) {
+		return bot.sendMessage(msg.from.id, "Successfully unsubscribed from all tickets.");
+	} else {
+		return bot.sendMessage(msg.from.id, "There was an error.");
+	}
+});
+
+bot.onText(/\/tickets/, function(msg) {
+	var request = {
+		"userid": msg.from.id,
+		"list": true
+	};
+	var tickets = sendRequest(request);
+	return bot.sendMessage(msg.from.id, "You are currently subscribed to these tickets: \n" + tickets.join("\n"));
+});
+
+bot.onText(/\/(?!subscribe|unsubscribe|stop|tickets)[a-z0-9]+/, function(msg) {
 	return bot.sendMessage(msg.from.id, "unknown command!"); // + usage
 });
 
-function checkTicket(arg) {
-	return arg.match(/[A-Za-z][0-9]{3}/);
+function checkTicket(ticket) {
+	if (ticket.match(/[A-Za-z][0-9]{3}/)) {
+		var request = {
+			"search": true,
+			"ticket": ticket
+		};
+		if (sendRequest(request) !== false) {
+			return true;
+		}
+	} else {
+		return false;
+	}
+}
+
+function sendRequest(request) {
+	request.requestid = shortid.generate();
+	console.log(request);
+	requester.post(
+		'localhost:1234',
+		request,
+		function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+				if (body.requestid === request.requestid && body.status === "success") {
+					return body.data;
+				} else {
+					// send a message to the developer
+					return false;
+				}
+			} else {
+				console.log(response);
+				return false;
+			}
+		}
+	);
 }
 
 console.log("Bot is running");
