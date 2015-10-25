@@ -67,7 +67,11 @@ bot.onText(/\/tickets/, function(msg) {
 		"list": true
 	};
 	var tickets = sendRequest(request);
-	return bot.sendMessage(msg.from.id, "You are currently subscribed to these tickets: \n" + tickets.join("\n"));
+	if (tickets !== false) {
+		return bot.sendMessage(msg.from.id, "You are currently subscribed to these tickets: \n" + tickets.join("\n"));
+	} else {
+		return bot.sendMessage(msg.from.id, "There was an error.");
+	}
 });
 
 bot.onText(/\/(?!subscribe|unsubscribe|stop|tickets)[a-z0-9]+/, function(msg) {
@@ -91,15 +95,18 @@ function checkTicket(ticket) {
 function sendRequest(request) {
 	request.requestid = shortid.generate();
 	console.log(request);
-	requester.post(
-		'localhost:1234',
-		request,
-		function (error, response, body) {
+	requester.post({
+		json: true,
+		url: 'localhost:1234',
+		body: request
+	}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				if (body.requestid === request.requestid && body.status === "success") {
+					console.log(body);
 					return body.data;
 				} else {
 					// send a message to the developer
+					console.log(body);
 					return false;
 				}
 			} else {
